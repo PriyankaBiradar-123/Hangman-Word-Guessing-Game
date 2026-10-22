@@ -1,0 +1,100 @@
+
+# Hangman Word Guessing Game
+
+A beginner-friendly, terminal-based Hangman game developed using Python 3.
+
+## About the Project
+
+Hangman is a word-guessing game in which the player tries to reveal a hidden word by guessing one letter at a time. The player can make a maximum of six incorrect guesses before the game ends.
+
+## Features
+
+- Random word selection
+- ASCII gallows animation through multiple stages
+- Six incorrect guesses allowed
+- Masked word display
+- Correct and incorrect guess tracking
+- Duplicate guess prevention
+- Input validation
+- Win and loss messages
+- Replay option
+- External word list with built-in fallback
+
+## Technologies Used
+
+- Python 3
+- random module
+- pathlib module
+- Python standard library
+
+## Project Structure
+
+    Hangman-Game/
+    ├── hangman.py
+    ├── words.txt
+    ├── README.md
+    └── .gitignore
+
+## Requirements
+
+- Python 3.10 or newer recommended
+- VS Code or PyCharm
+- Terminal or command prompt
+
+No external Python packages are required.
+
+## How to Run
+
+1. Clone or download this repository.
+2. Open the project folder in VS Code.
+3. Open the terminal.
+4. Run the following command:
+
+       python hangman.py
+
+   On Windows, you can also use:
+
+       py hangman.py
+
+5. Enter one letter at a time.
+6. Try to guess the hidden word before all six incorrect guesses are used.
+
+## Rules
+
+- Guess one letter per turn.
+- Correct guesses reveal letters in the word.
+- Incorrect guesses update the gallows.
+- Repeated guesses do not cost an attempt.
+- Guess the complete word to win.
+- Six incorrect guesses result in a loss.
+
+## Learning Outcomes
+
+This project demonstrates:
+
+- Variables and data types
+- Strings and string manipulation
+- Lists and sets
+- Conditional statements
+- Loops and control flow
+- Functions and modular programming
+- Random selection
+- File handling
+- Input validation
+- Exception handling
+
+## Future Improvements
+
+- Difficulty levels
+- Score tracking
+- Hints for difficult words
+- Categories such as technology, animals, and science
+- Unit tests
+
+## Author
+
+Created as a Python programming internship project.
+
+## License
+
+This project is available for educational use under the MIT License.
