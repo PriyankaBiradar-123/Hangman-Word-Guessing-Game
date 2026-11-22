@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f2f4ed">
+  <title>Letter Club | A little word game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght,SOFT,WONK@9..144,40,40,1&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f2f4ed;
+      --white: #fffefa;
+      --ink: #173a32;
+      --muted: #78857a;
+      --line: #e6e9df;
+      --green: #167451;
+      --lime: #d7ed78;
+      --coral: #e8735b;
+      --yellow: #f1c84b;
+      --font: "DM Sans", "Segoe UI", sans-serif;
+      --display: "Fraunces", Georgia, serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#173a3210 .8px, transparent .8px);
+      background-size: 15px 15px;
+      font-family: var(--font);
+    }
+
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+
+    .topbar {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 max(6vw, calc((100vw - 1200px) / 2));
+      border-bottom: 1px solid #173a3215;
+      background: #f8f9f4e8;
+    }
+
+    .brand { display: flex; align-items: center; gap: 11px; }
+    .brand-mark {
+      width: 35px;
+      height: 35px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px 11px 11px 4px;
+      color: var(--ink);
+      background: var(--lime);
+      font-size: 19px;
+      font-weight: 800;
+      transform: rotate(-5deg);
+    }
+    .brand-name { font-size: 14px; font-weight: 800; letter-spacing: 0; }
+    .brand-note { margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 600; }
+    .top-stats { display: flex; align-items: center; gap: 9px; }
+    .stat {
+      min-width: 83px;
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: var(--white);
+      text-align: center;
+    }
+    .stat-label { display: block; color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+    .stat-value { display: block; margin-top: 2px; font-size: 14px; font-weight: 800; }
+    .stat-value .flame { color: var(--coral); }
+
+    main { width: min(1050px, calc(100% - 40px)); margin: 41px auto 28px; }
+    .intro { margin-bottom: 21px; text-align: center; }
+    .eyebrow { color: var(--green); font-size: 10px; font-weight: 800; letter-spacing: 1.6px; text-transform: uppercase; }
+    h1 { margin: 6px 0 3px; font-family: var(--display); font-size: clamp(32px, 4vw, 43px); font-weight: 500; line-height: 1.1; }
+    .intro p { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+
+    .game {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      overflow: hidden;
+      border: 1px solid #173a321b;
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 14px 45px #173a3210, 0 2px 6px #173a3208;
+    }
+
+    .scene {
+      position: relative;
+      min-height: 435px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background-color: #ddebba;
+      background-image: radial-gradient(#173a3212 .8px, transparent .8px);
+      background-size: 13px 13px;
+    }
+    .scene::before, .scene::after { position: absolute; content: ""; border-radius: 50%; }
+    .scene::before { width: 245px; height: 245px; top: -115px; left: -83px; background: #f5f4ce; }
+    .scene::after { width: 180px; height: 180px; right: -74px; bottom: -96px; border: 1px solid #173a3219; }
+    .scene-label {
+      position: absolute;
+      z-index: 1;
+      top: 21px;
+      left: 23px;
+      color: #355a49;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+    }
+    .scene-number { position: absolute; z-index: 1; top: 18px; right: 21px; color: #355a49; font-size: 11px; font-weight: 700; }
+    .illustration { position: relative; z-index: 1; width: 246px; height: 286px; margin-top: 19px; }
+    .beam { position: absolute; background: #597756; border-radius: 4px; }
+    .beam-upright { left: 39px; bottom: 30px; width: 9px; height: 236px; }
+    .beam-top { left: 42px; top: 13px; width: 133px; height: 9px; }
+    .beam-support { left: 50px; top: 20px; width: 8px; height: 52px; transform: rotate(45deg); transform-origin: top; }
+    .beam-base { left: 13px; bottom: 25px; width: 183px; height: 9px; }
+    .rope { position: absolute; top: 20px; left: 168px; width: 4px; height: 38px; border-radius: 3px; background: #597756; }
+    .figure { position: absolute; top: 54px; left: 137px; width: 67px; height: 154px; }
+    .part { position: absolute; opacity: 0; transition: opacity .32s ease, transform .32s ease; }
+    .part.visible { opacity: 1; transform: translateY(0) scale(1); }
+    .head { top: 0; left: 18px; width: 40px; height: 40px; border: 4px solid var(--ink); border-radius: 50%; background: #fffefa; transform: translateY(5px) scale(.8); }
+    .face { position: absolute; top: 11px; left: 8px; color: var(--ink); font-size: 14px; font-weight: 800; letter-spacing: 2px; }
+    .torso { top: 37px; left: 36px; width: 4px; height: 48px; border-radius: 4px; background: var(--ink); transform: translateY(-4px) scaleY(.5); transform-origin: top; }
+    .arm-left, .arm-right, .leg-left, .leg-right { height: 4px; border-radius: 4px; background: var(--ink); transform: scaleX(.3); }
+    .arm-left { top: 52px; left: 10px; width: 29px; transform: rotate(-38deg) scaleX(.3); transform-origin: right; }
+    .arm-right { top: 52px; left: 37px; width: 29px; transform: rotate(38deg) scaleX(.3); transform-origin: left; }
+    .leg-left { top: 94px; left: 11px; width: 32px; transform: rotate(-48deg) scaleX(.3); transform-origin: right; }
+    .leg-right { top: 94px; left: 34px; width: 32px; transform: rotate(48deg) scaleX(.3); transform-origin: left; }
+    .figure .arm-left.visible { transform: rotate(-38deg) scaleX(1); }
+    .figure .arm-right.visible { transform: rotate(38deg) scaleX(1); }
+    .figure .leg-left.visible { transform: rotate(-48deg) scaleX(1); }
+    .figure .leg-right.visible { transform: rotate(48deg) scaleX(1); }
+    .torso.visible { transform: translateY(0) scaleY(1); }
+    .ground { position: absolute; bottom: 24px; left: 0; width: 217px; height: 8px; border-radius: 50%; background: #59775625; }
+    .scene-caption { position: absolute; z-index: 1; bottom: 18px; color: #456449; font-size: 11px; font-weight: 600; }
+
+    .play-area { min-width: 0; display: flex; flex-direction: column; padding: 26px 29px 21px; }
+    .play-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .section-label { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
+    .difficulty { display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 7px; background: #f7f8f3; }
+    .difficulty button { padding: 6px 9px; border: 0; border-radius: 5px; color: #748073; background: transparent; cursor: pointer; font-size: 10px; font-weight: 700; }
+    .difficulty button[aria-pressed="true"] { color: var(--ink); background: white; box-shadow: 0 1px 4px #173a321a; }
+    .lives-row { display: flex; align-items: center; justify-content: space-between; margin-top: 28px; }
+    .lives { display: flex; gap: 5px; }
+    .life { width: 22px; height: 21px; color: var(--coral); transition: opacity .2s, transform .2s; }
+    .life.lost { opacity: .2; transform: scale(.8); }
+    .life svg { display: block; width: 100%; height: 100%; fill: currentColor; }
+    .lives-count { color: var(--muted); font-size: 11px; font-weight: 600; }
+
+    .word { min-height: 66px; display: flex; align-items: center; justify-content: center; gap: clamp(5px, 1.1vw, 11px); margin: 20px 0 8px; }
+    .letter {
+      width: clamp(25px, 4vw, 37px);
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-bottom: 3px solid #bdc9b6;
+      color: var(--ink);
+      font-family: var(--display);
+      font-size: clamp(23px, 3vw, 30px);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .letter.revealed { border-color: var(--green); animation: pop .24s ease-out; }
+    @keyframes pop { from { transform: translateY(5px); opacity: .4; } to { transform: translateY(0); opacity: 1; } }
+    .message { min-height: 21px; margin: 0; color: var(--muted); text-align: center; font-size: 11px; }
+    .message.good { color: var(--green); font-weight: 700; }
+    .message.bad { color: #bd5544; font-weight: 700; }
+    .message.over { color: var(--ink); font-weight: 800; }
+    .divider { height: 1px; margin: 18px 0; background: var(--line); }
+    .keyboard { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px 6px; }
+    .key {
+      height: 39px;
+      min-width: 0;
+      border: 1px solid #e6e9df;
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fffefa;
+      box-shadow: 0 2px 0 #e7e9e1;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      transition: transform .12s, background .15s, color .15s, box-shadow .12s;
+    }
+    .key:not(:disabled):hover { border-color: #b6cba8; background: #f5f8ee; transform: translateY(-1px); }
+    .key:not(:disabled):active { box-shadow: none; transform: translateY(2px); }
+    .key:disabled { cursor: default; }
+    .key.correct { border-color: #cce3d3; color: var(--green); background: #eaf5ed; box-shadow: none; }
+    .key.incorrect { border-color: #efdbd5; color: #b95d4b; background: #f8edeb; box-shadow: none; }
+    .key:disabled:not(.correct):not(.incorrect) { opacity: .35; }
+    .play-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 18px; }
+    .hint-button, .new-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 37px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--white); cursor: pointer; font-size: 11px; font-weight: 700; }
+    .hint-button { color: var(--ink); }
+    .hint-button span { color: #cb9512; font-size: 15px; }
+    .hint-button:disabled { opacity: .55; cursor: default; }
+    .new-button { border-color: var(--ink); color: white; background: var(--ink); }
+    .new-button:hover { background: #285447; }
+    .hint-cost { color: var(--muted); font-size: 10px; }
+
+    .how-to { display: flex; align-items: center; justify-content: center; gap: 7px; margin-top: 16px; color: #768174; font-size: 10px; }
+    .keycap { min-width: 19px; padding: 2px 5px; border: 1px solid #dfe3d8; border-radius: 4px; color: #526457; background: #f8f9f5; text-align: center; font-size: 9px; font-weight: 700; }
+    .toast { position: fixed; right: 20px; bottom: 20px; z-index: 5; padding: 11px 15px; border: 1px solid #dce5d2; border-radius: 7px; color: var(--ink); background: white; box-shadow: 0 8px 25px #173a321c; font-size: 12px; font-weight: 700; animation: toast-in .2s ease-out; }
+    @keyframes toast-in { from { transform: translateY(7px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .loading { display: grid; min-height: 280px; place-items: center; color: var(--muted); font-size: 14px; }
+    .error { width: min(520px, calc(100% - 32px)); margin: 50px auto; padding: 22px; border: 1px solid #efc8bc; border-radius: 8px; background: white; line-height: 1.6; }
+    .error strong { color: #a84735; }
+
+    @media (max-width: 700px) {
+      .topbar { height: 66px; padding: 0 17px; }
+      .stat { min-width: 67px; padding: 7px 8px; }
+      main { width: min(480px, calc(100% - 24px)); margin: 25px auto 20px; }
+      .intro { margin-bottom: 16px; }
+      .intro p { font-size: 12px; }
+      .game { grid-template-columns: 1fr; }
+      .scene { min-height: 258px; }
+      .illustration { transform: scale(.75); margin-top: 19px; margin-bottom: -38px; }
+      .scene-label { top: 15px; left: 17px; }
+      .scene-number { top: 13px; right: 16px; }
+      .scene-caption { bottom: 12px; }
+      .play-area { padding: 20px 19px 17px; }
+      .lives-row { margin-top: 22px; }
+      .word { margin-top: 14px; }
+      .divider { margin: 14px 0; }
+      .key { height: 38px; }
+      .how-to { margin-top: 13px; }
+    }
+    @media (max-width: 370px) {
+      .brand-note { display: none; }
+      .top-stats { gap: 5px; }
+      .stat { min-width: 58px; padding-inline: 5px; }
+      .play-header { align-items: flex-start; }
+      .difficulty button { padding-inline: 7px; }
+      .keyboard { gap: 6px 4px; }
+      .key { height: 36px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand" aria-label="Letter Club">
+      <div class="brand-mark" aria-hidden="true">L</div>
+      <div><div class="brand-name">LETTER CLUB</div><div class="brand-note">a little game for your big brain</div></div>
+    </div>
+    <div class="top-stats" aria-label="Your game stats">
+      <div class="stat"><span class="stat-label">Best streak</span><span class="stat-value"><span class="flame" aria-hidden="true">&#9733;</span> <span id="best-streak">0</span></span></div>
+      <div class="stat"><span class="stat-label">Score</span><span class="stat-value" id="score">0000</span></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div class="eyebrow">A pocket-sized brain break</div>
+      <h1 id="page-title">Find the missing word.</h1>
+      <p>Six guesses. One mystery word. You've got this.</p>
+    </section>
+
+    <section class="game" aria-label="Hangman word game">
+      <div class="scene" aria-label="The hangman drawing appears here">
+        <div class="scene-label">Your little word quest</div>
+        <div class="scene-number" id="round-number">ROUND 01</div>
+        <div class="illustration" aria-hidden="true">
+          <div class="beam beam-upright"></div><div class="beam beam-top"></div><div class="beam beam-support"></div><div class="beam beam-base"></div><div class="rope"></div>
+          <div class="figure">
+            <div class="part head" data-mistake="1"><span class="face">&#183; &#183;</span></div>
+            <div class="part torso" data-mistake="2"></div>
+            <div class="part arm-left" data-mistake="3"></div><div class="part arm-right" data-mistake="4"></div>
+            <div class="part leg-left" data-mistake="5"></div><div class="part leg-right" data-mistake="6"></div>
+          </div>
+          <div class="ground"></div>
+        </div>
+        <div class="scene-caption" id="scene-caption">Our little adventurer is ready.</div>
+      </div>
+
+      <div class="play-area">
+        <div class="play-header">
+          <span class="section-label">Pick your pace</span>
+          <div class="difficulty" role="group" aria-label="Word length difficulty">
+            <button type="button" data-mode="easy" aria-pressed="false">Easy</button>
+            <button type="button" data-mode="steady" aria-pressed="true">Steady</button>
+            <button type="button" data-mode="spicy" aria-pressed="false">Spicy</button>
+          </div>
+        </div>
+
+        <div class="lives-row">
+          <div class="lives" id="lives" aria-label="Six guesses remaining"></div>
+          <div class="lives-count" id="lives-count" aria-live="polite">6 guesses left</div>
+        </div>
+
+        <div class="word" id="word" aria-label="Mystery word"></div>
+        <p class="message" id="message" aria-live="polite">Choose a letter to reveal the word.</p>
+        <div class="divider"></div>
+        <div class="keyboard" id="keyboard" role="group" aria-label="Letter keyboard"></div>
+
+        <div class="play-footer">
+          <button class="hint-button" id="hint" type="button"><span aria-hidden="true">&#10022;</span> Tiny hint <span class="hint-cost">costs 1 guess</span></button>
+          <button class="new-button" id="new-game" type="button"><span aria-hidden="true">&#8635;</span> New word</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="how-to" aria-label="Keyboard shortcut">
+      <span class="keycap">A–Z</span> type a letter to guess <span aria-hidden="true">&middot;</span> <span class="keycap">Enter</span> new word
+    </div>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+
+  <script>
+    (() => {
+      const maxMistakes = 6;
+      const alphabet = "abcdefghijklmnopqrstuvwxyz";
+      const pools = { easy: [], steady: [], spicy: [] };
+      const modes = { easy: [4, 6], steady: [7, 9], spicy: [10, 14] };
+      const elements = {
+        word: document.querySelector("#word"), keyboard: document.querySelector("#keyboard"),
+        lives: document.querySelector("#lives"), livesCount: document.querySelector("#lives-count"),
+        message: document.querySelector("#message"), score: document.querySelector("#score"),
+        bestStreak: document.querySelector("#best-streak"), hint: document.querySelector("#hint"),
+        caption: document.querySelector("#scene-caption"), round: document.querySelector("#round-number"),
+        toast: document.querySelector("#toast")
+      };
+      let word = "";
+      let guessed = new Set();
+      let mistakes = 0;
+      let gameOver = false;
+      let mode = "steady";
+      let round = 0;
+      let score = Number(localStorage.getItem("lastLetterScore")) || 0;
+      let bestStreak = Number(localStorage.getItem("lastLetterStreak")) || 0;
+      let streak = 0;
+      let toastTimer;
+
+      const heart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>';
+
+      function showError() {
+        document.querySelector("main").innerHTML = '<div class="error"><strong>One quick setup step:</strong><br>Open this game through a local web server so it can read <code>words.txt</code>. From the game folder, run <code>py -m http.server 8000</code>, then visit <code>http://localhost:8000</code>.</div>';
+      }
+
+      function setMessage(text, kind = "") {
+        elements.message.textContent = text;
+        elements.message.className = `message ${kind}`.trim();
+      }
+
+      function setMode(nextMode) {
+        mode = nextMode;
+        document.querySelectorAll("[data-mode]").forEach(button => {
+          button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+        });
+        startRound();
+      }
+
+      function startRound() {
+        const choices = pools[mode];
+        word = choices[Math.floor(Math.random() * choices.length)];
+        guessed = new Set();
+        const startingLetters = mode === "spicy" ? 2 : 1;
+        const availableLetters = [...new Set(word)];
+        for (let index = 0; index < startingLetters; index += 1) {
+          const letterIndex = Math.floor(Math.random() * availableLetters.length);
+          guessed.add(availableLetters.splice(letterIndex, 1)[0]);
+        }
+        mistakes = 0;
+        gameOver = false;
+        round += 1;
+        elements.round.textContent = `ROUND ${String(round).padStart(2, "0")}`;
+        elements.caption.textContent = "Our little adventurer is ready.";
+        elements.hint.disabled = false;
+        setMessage(`${startingLetters} free ${startingLetters === 1 ? "letter" : "letters"} to get you started. Keep guessing!`);
+        render();
+      }
+
+      function render() {
+        elements.word.replaceChildren();
+        for (const letter of word) {
+          const slot = document.createElement("span");
+          slot.className = `letter${guessed.has(letter) || gameOver ? " revealed" : ""}`;
+          slot.textContent = guessed.has(letter) || gameOver ? letter : "";
+          slot.setAttribute("aria-label", guessed.has(letter) || gameOver ? letter : "hidden letter");
+          elements.word.append(slot);
+        }
+        elements.keyboard.replaceChildren();
+        for (const letter of alphabet) {
+          const key = document.createElement("button");
+          key.type = "button";
+          key.className = "key";
+          key.textContent = letter;
+          key.setAttribute("aria-label", `Guess ${letter.toUpperCase()}`);
+          if (guessed.has(letter)) {
+            key.disabled = true;
+            key.classList.add(word.includes(letter) ? "correct" : "incorrect");
+          } else if (gameOver) {
+            key.disabled = true;
+          } else {
+            key.addEventListener("click", () => guess(letter));
+          }
+          elements.keyboard.append(key);
+        }
+        elements.lives.replaceChildren();
+        for (let index = 0; index < maxMistakes; index += 1) {
+          const life = document.createElement("span");
+          life.className = `life${index < mistakes ? " lost" : ""}`;
+          life.innerHTML = heart;
+          elements.lives.append(life);
+        }
+        const remaining = maxMistakes - mistakes;
+        elements.lives.setAttribute("aria-label", `${remaining} ${remaining === 1 ? "guess" : "guesses"} remaining`);
+        elements.livesCount.textContent = `${remaining} ${remaining === 1 ? "guess" : "guesses"} left`;
+        document.querySelectorAll("[data-mistake]").forEach(part => {
+          part.classList.toggle("visible", Number(part.dataset.mistake) <= mistakes);
+        });
+        elements.score.textContent = String(score).padStart(4, "0");
+        elements.bestStreak.textContent = bestStreak;
+      }
+
+      function finish(won) {
+        gameOver = true;
+        if (won) {
+          const points = 100 + (maxMistakes - mistakes) * 25;
+          score += points;
+          streak += 1;
+          bestStreak = Math.max(bestStreak, streak);
+          localStorage.setItem("lastLetterScore", score);
+          localStorage.setItem("lastLetterStreak", bestStreak);
+          setMessage(`Brilliant! +${points} points. The word was ${word.toUpperCase()}.`, "good");
+          elements.caption.textContent = "A perfect little victory.";
+        } else {
+          streak = 0;
+          localStorage.setItem("lastLetterStreak", bestStreak);
+          setMessage(`So close! The word was ${word.toUpperCase()}.`, "over");
+          elements.caption.textContent = "Every good adventurer gets another try.";
+        }
+        elements.hint.disabled = true;
+        render();
+      }
+
+      function guess(letter) {
+        if (gameOver || guessed.has(letter)) return;
+        guessed.add(letter);
+        if (word.includes(letter)) {
+          const done = [...word].every(character => guessed.has(character));
+          if (done) finish(true);
+          else setMessage("Lovely guess. Keep that clever streak going!", "good");
+        } else {
+          mistakes += 1;
+          if (mistakes >= maxMistakes) finish(false);
+          else {
+            setMessage("Not this time. Take another little guess.", "bad");
+            elements.caption.textContent = "A tiny wobble, nothing more.";
+          }
+        }
+        render();
+      }
+
+      function useHint() {
+        if (gameOver || mistakes >= maxMistakes - 1) {
+          showToast("Save your last guess for a letter!");
+          return;
+        }
+        const options = [...new Set([...word].filter(letter => !guessed.has(letter)))];
+        if (!options.length) return;
+        const letter = options[Math.floor(Math.random() * options.length)];
+        mistakes += 1;
+        guessed.add(letter);
+        if ([...word].every(character => guessed.has(character))) {
+          finish(true);
+          return;
+        }
+        setMessage(`A little nudge: ${letter.toUpperCase()} is in the word.`, "good");
+        render();
+        elements.hint.disabled = true;
+        showToast("Hint used: one guess spent.");
+      }
+
+      function showToast(text) {
+        clearTimeout(toastTimer);
+        elements.toast.textContent = text;
+        elements.toast.hidden = false;
+        toastTimer = setTimeout(() => { elements.toast.hidden = true; }, 2100);
+      }
+
+      document.querySelectorAll("[data-mode]").forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
+      document.querySelector("#new-game").addEventListener("click", startRound);
+      elements.hint.addEventListener("click", useHint);
+      document.addEventListener("keydown", event => {
+        if (/^[a-z]$/i.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) guess(event.key.toLowerCase());
+        else if (event.key === "Enter" && !event.ctrlKey && !event.metaKey && !event.altKey) startRound();
+      });
+
+      fetch("./words.txt")
+        .then(response => {
+          if (!response.ok) throw new Error("word list unavailable");
+          return response.text();
+        })
+        .then(text => {
+          const words = [...new Set(text.split(/\r?\n/).map(line => line.trim().toLowerCase()).filter(word => /^[a-z]+$/.test(word)))];
+          for (const [key, [min, max]] of Object.entries(modes)) {
+            pools[key] = words.filter(word => word.length >= min && word.length <= max);
+          }
+          if (Object.values(pools).some(pool => pool.length === 0)) throw new Error("not enough words in the word list");
+          startRound();
+        })
+        .catch(showError);
+    })();
+  </script>
+</body>
+</html>

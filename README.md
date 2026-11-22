@@ -1,7 +1,7 @@
 
 # Hangman Word Guessing Game
 
-A beginner-friendly, terminal-based Hangman game developed using Python 3.
+A beginner-friendly Hangman word game with a Python terminal version and a browser-based game.
 
 ## About the Project
 
@@ -19,6 +19,7 @@ Hangman is a word-guessing game in which the player tries to reveal a hidden wor
 - Win and loss messages
 - Replay option
 - External word list with built-in fallback
+- Browser game with three word-length difficulties, on-screen and physical keyboards, hints, and saved scores
 
 ## Technologies Used
 
@@ -26,11 +27,13 @@ Hangman is a word-guessing game in which the player tries to reveal a hidden wor
 - random module
 - pathlib module
 - Python standard library
+- HTML, CSS, and JavaScript for the browser game
 
 ## Project Structure
 
     Hangman-Game/
     ├── hangman.py
+    ├── index.html
     ├── words.txt
     ├── README.md
     └── .gitignore
@@ -44,6 +47,20 @@ Hangman is a word-guessing game in which the player tries to reveal a hidden wor
 No external Python packages are required.
 
 ## How to Run
+
+### Browser game
+
+1. Open a terminal in the project folder.
+2. Start a local web server:
+
+    py -m http.server 8000
+
+3. Open `http://localhost:8000` in your browser.
+4. Choose a difficulty and guess using the on-screen keyboard or your keyboard.
+
+The browser game loads its words from `words.txt`. Keep the server running while you play.
+
+### Python terminal game
 
 1. Clone or download this repository.
 2. Open the project folder in VS Code.
