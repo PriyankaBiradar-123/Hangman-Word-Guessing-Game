@@ -19,7 +19,7 @@ Hangman is a word-guessing game in which the player tries to reveal a hidden wor
 - Win and loss messages
 - Replay option
 - External word list with built-in fallback
-- Browser game with three word-length difficulties, on-screen and physical keyboards, hints, and saved scores
+- Browser game with three word-length difficulties, on-screen and physical keyboards, dictionary clues with a letter fallback, and saved scores
 
 ## Technologies Used
 

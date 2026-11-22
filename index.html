@@ -304,7 +304,7 @@
         <div class="keyboard" id="keyboard" role="group" aria-label="Letter keyboard"></div>
 
         <div class="play-footer">
-          <button class="hint-button" id="hint" type="button"><span aria-hidden="true">&#10022;</span> Tiny hint <span class="hint-cost">costs 1 guess</span></button>
+          <button class="hint-button" id="hint" type="button"><span aria-hidden="true">&#10022;</span> Word clue <span class="hint-cost">costs 1 guess</span></button>
           <button class="new-button" id="new-game" type="button"><span aria-hidden="true">&#8635;</span> New word</button>
         </div>
       </div>
@@ -462,24 +462,49 @@
         render();
       }
 
-      function useHint() {
+      async function useHint() {
         if (gameOver || mistakes >= maxMistakes - 1) {
           showToast("Save your last guess for a letter!");
           return;
         }
         const options = [...new Set([...word].filter(letter => !guessed.has(letter)))];
         if (!options.length) return;
-        const letter = options[Math.floor(Math.random() * options.length)];
-        mistakes += 1;
-        guessed.add(letter);
-        if ([...word].every(character => guessed.has(character))) {
-          finish(true);
-          return;
-        }
-        setMessage(`A little nudge: ${letter.toUpperCase()} is in the word.`, "good");
-        render();
+        const requestRound = round;
         elements.hint.disabled = true;
-        showToast("Hint used: one guess spent.");
+        setMessage("Finding a clue for your word...");
+
+        try {
+          const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+          if (!response.ok) throw new Error("No dictionary entry found");
+          const entries = await response.json();
+          const definition = entries
+            .flatMap(entry => entry.meanings || [])
+            .flatMap(meaning => meaning.definitions || [])
+            .map(item => item.definition)
+            .find(item => typeof item === "string" && item.length > 0);
+          if (!definition) throw new Error("No definition found");
+          if (requestRound !== round || gameOver) return;
+
+          mistakes += 1;
+          const clue = definition.length > 150 ? `${definition.slice(0, 147).trimEnd()}...` : definition;
+          setMessage(`Clue: ${clue}`, "good");
+          render();
+          elements.hint.disabled = true;
+          showToast("Word clue used: one guess spent.");
+        } catch {
+          if (requestRound !== round || gameOver) return;
+          const letter = options[Math.floor(Math.random() * options.length)];
+          mistakes += 1;
+          guessed.add(letter);
+          if ([...word].every(character => guessed.has(character))) {
+            finish(true);
+            return;
+          }
+          setMessage(`No word clue available. Here's a letter: ${letter.toUpperCase()}.`, "good");
+          render();
+          elements.hint.disabled = true;
+          showToast("Letter hint used: one guess spent.");
+        }
       }
 
       function showToast(text) {
