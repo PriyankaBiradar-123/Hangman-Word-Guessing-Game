@@ -26,7 +26,9 @@
 
     * { box-sizing: border-box; }
     body {
-      min-width: 320px;
+      position: relative;
+      isolation: isolate;
+      min-width: 0;
       min-height: 100vh;
       margin: 0;
       color: var(--ink);
@@ -34,6 +36,27 @@
       background-image: radial-gradient(#173a3210 .8px, transparent .8px);
       background-size: 15px 15px;
       font-family: var(--font);
+    }
+
+    .sky-doodles { position: fixed; z-index: 0; inset: 0; overflow: hidden; pointer-events: none; }
+    .sky-doodles span {
+      position: absolute;
+      color: #63835b;
+      font-family: var(--display);
+      font-size: 27px;
+      font-weight: 600;
+      opacity: .3;
+      animation: doodle-drift 8s ease-in-out infinite alternate;
+    }
+    .sky-doodles span:nth-child(1) { top: 19%; left: 3%; color: #dd795d; font-size: 22px; }
+    .sky-doodles span:nth-child(2) { top: 38%; right: 4%; animation-delay: -2s; }
+    .sky-doodles span:nth-child(3) { top: 73%; left: 5%; color: #788651; font-size: 22px; animation-delay: -4s; }
+    .sky-doodles span:nth-child(4) { top: 82%; right: 7%; color: #dc805e; font-size: 23px; animation-delay: -1s; }
+    .sky-doodles span:nth-child(5) { top: 55%; right: 2%; font-size: 21px; animation-delay: -5s; }
+    .sky-doodles span:nth-child(6) { top: 10%; right: 19%; color: #b59c44; font-size: 19px; animation-delay: -3s; }
+    @keyframes doodle-drift {
+      from { transform: translate3d(0, 0, 0) rotate(-8deg); }
+      to { transform: translate3d(8px, -15px, 0) rotate(9deg); }
     }
 
     button { font: inherit; }
@@ -64,7 +87,22 @@
     }
     .brand-name { font-size: 14px; font-weight: 800; letter-spacing: 0; }
     .brand-note { margin-top: 2px; color: var(--muted); font-size: 10px; font-weight: 600; }
+    .topbar, main { position: relative; z-index: 1; }
     .top-stats { display: flex; align-items: center; gap: 9px; }
+    .sound-toggle {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      color: var(--ink);
+      background: var(--white);
+      cursor: pointer;
+    }
+    .sound-toggle:hover { border-color: #b6cba8; background: #f5f8ee; }
+    .sound-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .sound-toggle.is-muted .sound-waves, .sound-toggle:not(.is-muted) .sound-off { display: none; }
     .stat {
       min-width: 83px;
       padding: 8px 12px;
@@ -193,6 +231,19 @@
     }
     .key:not(:disabled):hover { border-color: #b6cba8; background: #f5f8ee; transform: translateY(-1px); }
     .key:not(:disabled):active { box-shadow: none; transform: translateY(2px); }
+    .key.just-correct { animation: key-pop .38s cubic-bezier(.2, 1.6, .4, 1); }
+    .key.just-wrong { animation: key-shake .3s ease-in-out; }
+    @keyframes key-pop {
+      0% { transform: scale(1); }
+      45% { transform: scale(1.2) rotate(-4deg); }
+      75% { transform: scale(.94) rotate(2deg); }
+      100% { transform: scale(1); }
+    }
+    @keyframes key-shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px) rotate(-3deg); }
+      75% { transform: translateX(4px) rotate(3deg); }
+    }
     .key:disabled { cursor: default; }
     .key.correct { border-color: #cce3d3; color: var(--green); background: #eaf5ed; box-shadow: none; }
     .key.incorrect { border-color: #efdbd5; color: #b95d4b; background: #f8edeb; box-shadow: none; }
@@ -222,7 +273,7 @@
       .intro p { font-size: 12px; }
       .game { grid-template-columns: 1fr; }
       .scene { min-height: 258px; }
-      .illustration { transform: scale(.75); margin-top: 19px; margin-bottom: -38px; }
+      .illustration { transform: translateY(-10px) scale(.75); margin-top: 19px; margin-bottom: -38px; }
       .scene-label { top: 15px; left: 17px; }
       .scene-number { top: 13px; right: 16px; }
       .scene-caption { bottom: 12px; }
@@ -234,9 +285,16 @@
       .how-to { margin-top: 13px; }
     }
     @media (max-width: 370px) {
+      .topbar { gap: 8px; padding-inline: 12px; }
+      .brand { gap: 7px; }
+      .brand-mark { width: 31px; height: 31px; }
+      .brand-name { font-size: 12px; }
       .brand-note { display: none; }
-      .top-stats { gap: 5px; }
-      .stat { min-width: 58px; padding-inline: 5px; }
+      .top-stats { gap: 4px; }
+      .sound-toggle { width: 32px; height: 32px; }
+      .stat { min-width: 49px; padding: 6px 4px; }
+      .stat-label { font-size: 7px; }
+      .stat-value { font-size: 12px; }
       .play-header { align-items: flex-start; }
       .difficulty button { padding-inline: 7px; }
       .keyboard { gap: 6px 4px; }
@@ -248,12 +306,16 @@
   </style>
 </head>
 <body>
+  <div class="sky-doodles" aria-hidden="true"><span>&#10022;</span><span>+</span><span>A</span><span>&#10023;</span><span>?</span><span>&#10022;</span></div>
   <header class="topbar">
     <div class="brand" aria-label="Letter Club">
       <div class="brand-mark" aria-hidden="true">L</div>
       <div><div class="brand-name">LETTER CLUB</div><div class="brand-note">a little game for your big brain</div></div>
     </div>
     <div class="top-stats" aria-label="Your game stats">
+      <button class="sound-toggle" id="sound-toggle" type="button" aria-label="Mute game sounds" aria-pressed="true" title="Mute game sounds">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 3V7l-5 3H4Z"/><path class="sound-waves" d="M16 9a5 5 0 0 1 0 6m2-8a8 8 0 0 1 0 10"/><path class="sound-off" d="m16 9 5 6m0-6-5 6"/></svg>
+      </button>
       <div class="stat"><span class="stat-label">Best streak</span><span class="stat-value"><span class="flame" aria-hidden="true">&#9733;</span> <span id="best-streak">0</span></span></div>
       <div class="stat"><span class="stat-label">Score</span><span class="stat-value" id="score">0000</span></div>
     </div>
@@ -327,6 +389,7 @@
         lives: document.querySelector("#lives"), livesCount: document.querySelector("#lives-count"),
         message: document.querySelector("#message"), score: document.querySelector("#score"),
         bestStreak: document.querySelector("#best-streak"), hint: document.querySelector("#hint"),
+        sound: document.querySelector("#sound-toggle"),
         caption: document.querySelector("#scene-caption"), round: document.querySelector("#round-number"),
         toast: document.querySelector("#toast")
       };
@@ -339,6 +402,9 @@
       let score = Number(localStorage.getItem("lastLetterScore")) || 0;
       let bestStreak = Number(localStorage.getItem("lastLetterStreak")) || 0;
       let streak = 0;
+      let soundEnabled = true;
+      let audioContext;
+      let lastGuess = "";
       let toastTimer;
 
       const heart = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.7a5.5 5.5 0 0 0-7.8 0L12 5.8l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.4 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/></svg>';
@@ -350,6 +416,44 @@
       function setMessage(text, kind = "") {
         elements.message.textContent = text;
         elements.message.className = `message ${kind}`.trim();
+      }
+
+      function playSound(kind) {
+        if (!soundEnabled) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        try {
+          audioContext ||= new AudioContextClass();
+          if (audioContext.state === "suspended") audioContext.resume();
+          const sounds = {
+            correct: [{ frequency: 660, delay: 0, duration: .1 }, { frequency: 880, delay: .07, duration: .12 }],
+            wrong: [{ frequency: 205, delay: 0, duration: .17, type: "triangle" }],
+            win: [{ frequency: 523, delay: 0, duration: .15 }, { frequency: 659, delay: .12, duration: .15 }, { frequency: 784, delay: .24, duration: .22 }],
+            lose: [{ frequency: 260, delay: 0, duration: .16, type: "triangle" }, { frequency: 196, delay: .12, duration: .22, type: "triangle" }]
+          };
+
+          for (const note of sounds[kind] || []) {
+            const start = audioContext.currentTime + note.delay;
+            const oscillator = audioContext.createOscillator();
+            const volume = audioContext.createGain();
+            oscillator.type = note.type || "sine";
+            oscillator.frequency.setValueAtTime(note.frequency, start);
+            volume.gain.setValueAtTime(.0001, start);
+            volume.gain.exponentialRampToValueAtTime(.045, start + .012);
+            volume.gain.exponentialRampToValueAtTime(.0001, start + note.duration);
+            oscillator.connect(volume);
+            volume.connect(audioContext.destination);
+            oscillator.start(start);
+            oscillator.stop(start + note.duration);
+          }
+        } catch {
+          soundEnabled = false;
+          elements.sound.classList.add("is-muted");
+          elements.sound.setAttribute("aria-pressed", "false");
+          elements.sound.setAttribute("aria-label", "Turn game sounds on");
+          elements.sound.title = "Turn game sounds on";
+        }
       }
 
       function setMode(nextMode) {
@@ -364,6 +468,7 @@
         const choices = pools[mode];
         word = choices[Math.floor(Math.random() * choices.length)];
         guessed = new Set();
+        lastGuess = "";
         const startingLetters = mode === "spicy" ? 2 : 1;
         const availableLetters = [...new Set(word)];
         for (let index = 0; index < startingLetters; index += 1) {
@@ -399,6 +504,7 @@
           if (guessed.has(letter)) {
             key.disabled = true;
             key.classList.add(word.includes(letter) ? "correct" : "incorrect");
+            if (letter === lastGuess) key.classList.add(word.includes(letter) ? "just-correct" : "just-wrong");
           } else if (gameOver) {
             key.disabled = true;
           } else {
@@ -425,6 +531,7 @@
 
       function finish(won) {
         gameOver = true;
+        playSound(won ? "win" : "lose");
         if (won) {
           const points = 100 + (maxMistakes - mistakes) * 25;
           score += points;
@@ -447,15 +554,20 @@
       function guess(letter) {
         if (gameOver || guessed.has(letter)) return;
         guessed.add(letter);
+        lastGuess = letter;
         if (word.includes(letter)) {
           const done = [...word].every(character => guessed.has(character));
           if (done) finish(true);
-          else setMessage("Lovely guess. Keep that clever streak going!", "good");
+          else {
+            playSound("correct");
+            setMessage("Nice! That's in the word. Keep going!", "good");
+          }
         } else {
           mistakes += 1;
           if (mistakes >= maxMistakes) finish(false);
           else {
-            setMessage("Not this time. Take another little guess.", "bad");
+            playSound("wrong");
+            setMessage("Not quite. Try again!", "bad");
             elements.caption.textContent = "A tiny wobble, nothing more.";
           }
         }
@@ -517,6 +629,15 @@
       document.querySelectorAll("[data-mode]").forEach(button => button.addEventListener("click", () => setMode(button.dataset.mode)));
       document.querySelector("#new-game").addEventListener("click", startRound);
       elements.hint.addEventListener("click", useHint);
+      elements.sound.addEventListener("click", () => {
+        soundEnabled = !soundEnabled;
+        elements.sound.classList.toggle("is-muted", !soundEnabled);
+        elements.sound.setAttribute("aria-pressed", String(soundEnabled));
+        const label = soundEnabled ? "Mute game sounds" : "Turn game sounds on";
+        elements.sound.setAttribute("aria-label", label);
+        elements.sound.title = label;
+        if (soundEnabled) playSound("correct");
+      });
       document.addEventListener("keydown", event => {
         if (/^[a-z]$/i.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) guess(event.key.toLowerCase());
         else if (event.key === "Enter" && !event.ctrlKey && !event.metaKey && !event.altKey) startRound();
